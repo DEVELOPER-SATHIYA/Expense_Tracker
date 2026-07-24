@@ -246,7 +246,12 @@ export default function Dashboard() {
                       borderRadius: 8,
                       fontSize: 11,
                     }}
-                    formatter={(v: number) => [fmt(v)]}
+
+
+                    formatter={(value) => [
+                      fmt(Number(value ?? 0))
+                    ]}
+
                   />
                 </PieChart>
               </ResponsiveContainer>
