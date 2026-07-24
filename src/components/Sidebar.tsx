@@ -11,7 +11,6 @@ import {
 
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import Colors from "../theme/colors";
 
 import AccountSwitcher from "../components/account/AccountSwitcher";
 const menus = [

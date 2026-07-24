@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useTransactions } from "../../hooks/useTransactions";
 import { useCategories } from "../../hooks/useCategories";
 import type {
     CreateTransactionPayload,

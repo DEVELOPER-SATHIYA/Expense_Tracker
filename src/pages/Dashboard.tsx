@@ -183,9 +183,10 @@ export default function Dashboard() {
                   color: "#e2e8f0",
                   marginBottom: 4,
                 }}
-                formatter={(v: number, name: string) => [
-                  fmt(v),
-                  name.charAt(0).toUpperCase() + name.slice(1),
+
+                formatter={(value: any, name: any) => [
+                  fmt(Number(value)),
+                  name,
                 ]}
                 cursor={{ fill: "rgba(255,255,255,0.03)" }}
               />
