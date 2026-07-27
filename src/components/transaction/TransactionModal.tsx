@@ -22,6 +22,8 @@ interface Props {
 const PAYMENT_METHODS = [
     "Cash",
     "UPI",
+    "Sakthi-UPI",
+    "Senthil-UPI",
     "Bank Transfer",
     "Credit Card",
     "Debit Card",
