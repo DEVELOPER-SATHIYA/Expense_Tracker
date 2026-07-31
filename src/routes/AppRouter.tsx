@@ -10,6 +10,7 @@ import Transactions from "../pages/Transactions";
 import Settings from "../pages/Settings";
 import MonthlyProfit from "../pages/MonthlyProfit";
 import LeakReport from "../pages/LeakReport";
+import Onboarding from "../pages/Onboarding";
 
 export default function AppRouter() {
   return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<ProtectedRoute />}>
+          <Route path="onboarding" element={<Onboarding />} />
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />

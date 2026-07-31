@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { markNeedsOnboarding } from "../utils/onboarding";
 import logo from "../assets/money-leak-logo.png";
 
 export default function Register() {
@@ -26,6 +27,7 @@ export default function Register() {
     try {
       setLoading(true);
       await signup(email, password);
+      markNeedsOnboarding();
       toast.success("Registration successful");
       setEmail("");
       setPassword("");
