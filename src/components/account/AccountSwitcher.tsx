@@ -43,7 +43,7 @@ export default function AccountSwitcher() {
                 >
                     <div className="flex items-center gap-3">
 
-                        <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center">
 
                             {currentAccount?.type === "business" ? (
                                 <Briefcase size={18} />

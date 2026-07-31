@@ -25,11 +25,9 @@ export function useTransactions() {
     }
     try {
       setLoading(true);
-      console.log("currentAccount.id-----------------------", currentAccount.id);
       const data = await transactionService.getTransactions(
         currentAccount.id
       );
-      console.log("data-----------------------", data);
 
       setTransactions(data);
 
@@ -55,6 +53,22 @@ export function useTransactions() {
       ...payload,
       account_id: currentAccount.id,
     });
+
+    await load();
+  };
+
+  const createTransactions = async (
+    payloads: Omit<CreateTransactionPayload, "account_id">[]
+  ) => {
+    if (!currentAccount)
+      throw new Error("No account selected");
+
+    await transactionService.createTransactions(
+      payloads.map((payload) => ({
+        ...payload,
+        account_id: currentAccount.id,
+      }))
+    );
 
     await load();
   };
@@ -95,6 +109,7 @@ export function useTransactions() {
     error,
     refresh: load,
     createTransaction,
+    createTransactions,
     updateTransaction,
     deleteTransaction,
     dashboardSummary,

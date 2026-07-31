@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useAuth } from "../context/AuthContext";
 import { categoryService } from "../services/category.service";
 
 import type {
@@ -8,6 +9,8 @@ import type {
 } from "../services/category.service";
 
 export function useCategories() {
+  const { user, loading: authLoading } = useAuth();
+
   const [categories, setCategories] =
     useState<Category[]>([]);
 
@@ -35,8 +38,17 @@ export function useCategories() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      setCategories([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     load();
-  }, []);
+  }, [user, authLoading]);
 
   return {
     categories,

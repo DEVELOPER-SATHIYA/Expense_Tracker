@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { accountService } from "../services/account.service";
 
 import type {
@@ -7,6 +8,8 @@ import type {
 } from "../services/account.service";
 
 export function useAccounts() {
+  const { user, loading: authLoading } = useAuth();
+
   const [accounts, setAccounts] = useState<Account[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -30,8 +33,17 @@ export function useAccounts() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      setAccounts([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     loadAccounts();
-  }, []);
+  }, [user, authLoading]);
 
   const createAccount = async (
     payload: CreateAccountPayload

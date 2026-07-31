@@ -29,15 +29,15 @@ export default function CategoryCard({
     data: Category[]
   ) => (
     <div>
-      <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
-        <div className="flex items-center gap-2">
-          <Tag size={18} className="text-indigo-400" />
-          <h3 className="font-semibold text-white">{title}</h3>
+      <div className="flex items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-3 sm:px-5 sm:py-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <Tag size={18} className="shrink-0 text-indigo-400" />
+          <h3 className="truncate font-semibold text-white">{title}</h3>
         </div>
 
         <button
           onClick={() => onAdd(type)}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-2.5 py-2 text-xs font-medium text-white transition hover:bg-indigo-700 sm:gap-2 sm:px-3 sm:text-sm"
         >
           <Plus size={16} />
           Add

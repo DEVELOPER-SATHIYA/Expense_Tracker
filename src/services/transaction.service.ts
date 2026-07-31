@@ -97,6 +97,35 @@ class TransactionService {
     return data;
   }
 
+  async createTransactions(
+    payloads: CreateTransactionPayload[]
+  ) {
+    if (payloads.length === 0) {
+      throw new Error("No transactions to create");
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user)
+      throw new Error("User not authenticated");
+
+    const { data, error } = await supabase
+      .from("transactions")
+      .insert(
+        payloads.map((payload) => ({
+          ...payload,
+          user_id: user.id,
+        }))
+      )
+      .select();
+
+    if (error) throw error;
+
+    return data;
+  }
+
   async updateTransaction(
     id: string,
     payload: Partial<CreateTransactionPayload>

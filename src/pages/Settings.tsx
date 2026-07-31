@@ -58,28 +58,23 @@ export default function Settings() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-6">
-
+    <div className="safe-px mx-auto max-w-6xl space-y-4 p-3 sm:space-y-6 sm:p-5 md:p-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-3xl font-bold text-[#111827]">
+        <h1 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
           Settings
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-xl border border-white/[0.07] bg-[#111827] p-6 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-slate-400">
-            Logged in as
-          </p>
+      <div className="flex flex-col gap-4 rounded-xl border border-white/[0.07] bg-[#111827] p-4 sm:p-6 md:flex-row md:items-center md:justify-between">
+        <div className="min-w-0">
+          <p className="text-sm text-slate-400">Logged in as</p>
 
-          <p className="mt-1 font-medium text-white break-all">
-            {user?.email}
-          </p>
+          <p className="mt-1 break-all font-medium text-white">{user?.email}</p>
         </div>
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-white hover:bg-red-700 md:w-auto"
         >
           <LogOut size={18} />
           Logout

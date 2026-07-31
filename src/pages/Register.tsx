@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import type { FormEvent, CSSProperties } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
-import Colors from "../theme/colors";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import logo from "../assets/money-leak-logo.png";
 
 export default function Register() {
   const { signup } = useAuth();
@@ -14,16 +14,6 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,11 +25,8 @@ export default function Register() {
 
     try {
       setLoading(true);
-
       await signup(email, password);
-
-      toast.success("Registration Successful");
-
+      toast.success("Registration successful");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -51,283 +38,119 @@ export default function Register() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: Colors.white,
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        justifyContent: "center",
-        alignItems: "stretch",
-        padding: isMobile ? 12 : 24,
-        fontFamily: "Inter, sans-serif",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* Form Panel */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: Colors.white,
-          padding: isMobile ? "12px 0" : "8px",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 460,
-            background: "#111827",
-            borderRadius: 20,
-            padding: isMobile ? "28px 20px" : "32px",
-            boxShadow: "0 20px 40px rgba(0,0,0,.08)",
-            boxSizing: "border-box",
-          }}
+    <div className="flex min-h-[100dvh] bg-[#0d1117]">
+      <div className="safe-px safe-pb flex flex-1 items-center justify-center p-4 sm:p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-md space-y-5 rounded-2xl border border-white/[0.07] bg-[#161b22] p-5 shadow-2xl sm:p-8"
         >
-          {/* Header */}
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: 16,
-            }}
-          >
-            <h1
-              style={{
-                margin: 0,
-                fontSize: isMobile ? 24 : 32,
-                fontWeight: 700,
-                color: "#fff",
-              }}
-            >
-              Create Your Account
-            </h1>
-
-            <p
-              style={{
-                marginTop: 6,
-                color: "#6b7280",
-                fontSize: isMobile ? 14 : 15,
-              }}
-            >
-              Join our platform and unlock all features.
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <img
+              src={logo}
+              alt="கல்லாப்பெட்டி"
+              className="mb-3 h-16 w-16 object-contain lg:hidden"
+            />
+            <h2 className="text-2xl font-bold text-white">Create account</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Start plugging the leaks in your spending
             </p>
           </div>
 
-          {/* Form */}
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 18,
-            }}
-          >
-            <div>
-              <label style={labelStyle}>Email</label>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">
+              Email
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full rounded-xl border border-slate-700 bg-[#0d1117] px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-amber-500/50"
+            />
+          </div>
 
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">
+              Password
+            </label>
+            <div className="relative">
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                type={showPassword ? "text" : "password"}
                 required
-                style={inputStyle}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
+                className="w-full rounded-xl border border-slate-700 bg-[#0d1117] px-4 py-3 pr-12 text-sm text-white outline-none placeholder:text-slate-600 focus:border-amber-500/50"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              >
+                {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
             </div>
+          </div>
 
-            <div>
-              <label style={labelStyle}>Password</label>
-
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create password"
-                  required
-                  style={{
-                    ...inputStyle,
-                    paddingRight: 48,
-                  }}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={eyeButton}
-                >
-                  {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
-                </button>
-              </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">
+              Confirm password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat password"
+                className="w-full rounded-xl border border-slate-700 bg-[#0d1117] px-4 py-3 pr-12 text-sm text-white outline-none placeholder:text-slate-600 focus:border-amber-500/50"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              >
+                {showConfirmPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
             </div>
+          </div>
 
-            <div>
-              <label style={labelStyle}>Confirm Password</label>
-
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  required
-                  style={{
-                    ...inputStyle,
-                    paddingRight: 48,
-                  }}
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
-                  style={eyeButton}
-                >
-                  {showConfirmPassword ? (
-                    <Eye size={16} />
-                  ) : (
-                    <EyeOff size={16} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                marginTop: 10,
-                padding: "15px",
-                border: "none",
-                borderRadius: 12,
-                background: Colors.primaryLight,
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 16,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-                transition: "0.25s",
-              }}
-            >
-              {loading ? "Creating..." : "Create Account"}
-            </button>
-          </form>
-
-          {/* Footer */}
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: 16,
-            }}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-amber-500 py-3 text-sm font-semibold text-[#0d1117] transition hover:bg-amber-400 disabled:opacity-60"
           >
-            <span
-              style={{
-                color: "#6b7280",
-                fontSize: 15,
-              }}
-            >
-              Already have an account?
-            </span>
+            {loading ? "Creating account..." : "Create account"}
+          </button>
 
+          <p className="text-center text-sm text-slate-500">
+            Already have an account?{" "}
             <Link
               to="/login"
-              style={{
-                marginLeft: 8,
-                color: Colors.primaryLight,
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
+              className="font-semibold text-amber-400 hover:text-amber-300"
             >
-              Log In
+              Sign in
             </Link>
-          </div>
-        </div>
+          </p>
+        </form>
       </div>
 
-      {/* Decorative Illustration Side Panel - Hidden on Mobile */}
-      {!isMobile && (
-        <div
-          style={{
-            flex: 1,
-            background:
-              "linear-gradient(135deg, #ff9f1c, #ffbf69, #2ec4b6)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "#fff",
-            padding: "40px",
-            textAlign: "center",
-            borderRadius: "0 20px 20px 0",
-          }}
-        >
-          <div>
-            <img
-              src="/register-illustration.svg"
-              alt="Register"
-              style={{
-                width: "80%",
-                maxWidth: "450px",
-                marginBottom: "16px",
-              }}
-            />
-
-            <h1
-              style={{
-                fontSize: "42px",
-                fontWeight: 700,
-                marginBottom: "16px",
-              }}
-            >
-              Welcome!
-            </h1>
-
-            <p
-              style={{
-                fontSize: "18px",
-                opacity: 0.9,
-                lineHeight: 1.6,
-              }}
-            >
-              Create your account to manage your expenses, track reports, and
-              organize your finances in one place.
-            </p>
-          </div>
-        </div>
-      )}
+      <div className="relative hidden w-[46%] overflow-hidden border-l border-white/[0.06] lg:flex lg:flex-col lg:items-center lg:justify-center lg:p-10">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(245,158,11,0.18),_transparent_55%),radial-gradient(ellipse_at_bottom,_rgba(244,63,94,0.12),_transparent_50%)]" />
+        <img
+          src={logo}
+          alt="கல்லாப்பெட்டி"
+          className="relative z-10 mb-6 h-44 w-44 object-contain drop-shadow-2xl"
+        />
+        <h1 className="relative z-10 text-3xl font-bold tracking-tight text-white">
+          கல்லாப்பெட்டி
+        </h1>
+        <p className="relative z-10 mt-3 max-w-sm text-center text-sm leading-relaxed text-slate-400">
+          Know exactly where cash slips away — categories, payment methods, and
+          monthly trends in one place.
+        </p>
+      </div>
     </div>
   );
 }
-
-const labelStyle: CSSProperties = {
-  display: "block",
-  marginBottom: 6,
-  textAlign: "left",
-  fontWeight: 600,
-  color: "#fff",
-};
-
-const inputStyle: CSSProperties = {
-  width: "100%",
-  padding: "14px 16px",
-  border: "1px solid #d1d5db",
-  borderRadius: 8,
-  fontSize: 15,
-  boxSizing: "border-box",
-};
-
-const eyeButton: CSSProperties = {
-  position: "absolute",
-  top: "50%",
-  right: 12,
-  transform: "translateY(-50%)",
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-  fontSize: 18,
-  display: "flex",
-  alignItems: "center",
-};

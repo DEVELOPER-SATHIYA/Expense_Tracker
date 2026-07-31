@@ -18,21 +18,19 @@ export default function AccountCard({
   return (
     <div className="rounded-xl border border-white/[0.07] bg-[#161b22] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
-        <div className="flex items-center gap-2">
-          <Wallet size={18} className="text-indigo-400" />
+      <div className="flex items-center justify-between gap-2 border-b border-white/[0.07] px-3 py-3 sm:px-5 sm:py-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <Wallet size={18} className="shrink-0 text-indigo-400" />
 
-          <h2 className="text-sm font-semibold text-white">
-            Accounts
-          </h2>
+          <h2 className="truncate text-sm font-semibold text-white">Accounts</h2>
         </div>
 
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-2.5 py-2 text-xs font-medium text-white transition hover:bg-indigo-700 sm:gap-2 sm:px-3 sm:text-sm"
         >
           <Plus size={16} />
-          Add Account
+          Add
         </button>
       </div>
 

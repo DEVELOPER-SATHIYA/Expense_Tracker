@@ -1,18 +1,34 @@
 import { useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useAccount } from "../context/AccountContext";
 import { useTransactions } from "../hooks/useTransactions";
 import { useCategories } from "../hooks/useCategories";
-import { Pencil, Trash2, TrendingDown, TrendingUp } from "lucide-react";
+import { Download, Pencil, Trash2, TrendingDown, TrendingUp } from "lucide-react";
 import LoadingScreen from "./LoadingScreen";
+import TransactionModal from "../components/transaction/TransactionModal";
+import DeleteConfirmModal from "../components/settings/DeleteConfirmModal";
+import type { Transaction } from "../services/transaction.service";
 
 export default function Transactions() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [deletingTx, setDeletingTx] = useState<Transaction | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const { categories } = useCategories();
-  const { transactions, loading, error } = useTransactions();
+  const {
+    transactions,
+    loading,
+    error,
+    updateTransaction,
+    deleteTransaction,
+  } = useTransactions();
   const { accounts } = useAccount();
 
   const getCat = (id: string) => categories.find((c) => c.id === id);
@@ -36,8 +52,16 @@ export default function Transactions() {
       const matchesCategory =
         categoryFilter === "all" || tx.category_id === categoryFilter;
 
+      const matchesFrom = !fromDate || tx.transaction_date >= fromDate;
+      const matchesTo = !toDate || tx.transaction_date <= toDate;
+
       return (
-        matchesSearch && matchesType && matchesPayment && matchesCategory
+        matchesSearch &&
+        matchesType &&
+        matchesPayment &&
+        matchesCategory &&
+        matchesFrom &&
+        matchesTo
       );
     });
   }, [
@@ -46,6 +70,8 @@ export default function Transactions() {
     typeFilter,
     paymentFilter,
     categoryFilter,
+    fromDate,
+    toDate,
     categories,
   ]);
 
@@ -74,56 +100,151 @@ export default function Transactions() {
     setTypeFilter("all");
     setPaymentFilter("all");
     setCategoryFilter("all");
+    setFromDate("");
+    setToDate("");
   };
+
+  const exportCsv = () => {
+    if (filteredTransactions.length === 0) {
+      toast.error("No transactions to export.");
+      return;
+    }
+
+    const headers = [
+      "Date",
+      "Type",
+      "Category",
+      "Amount",
+      "Account",
+      "Payment Method",
+      "Notes",
+    ];
+
+    const rows = filteredTransactions.map((tx) => [
+      tx.transaction_date,
+      tx.type,
+      getCat(tx.category_id)?.name ?? "",
+      String(tx.amount),
+      getAcc(tx.account_id)?.name ?? "",
+      tx.payment_method ?? "",
+      (tx.notes ?? "").replace(/"/g, '""'),
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `kallappetti-transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exported.");
+  };
+
+  const handleDelete = async () => {
+    if (!deletingTx) return;
+
+    try {
+      setDeleting(true);
+      await deleteTransaction(deletingTx.id);
+      toast.success("Transaction deleted successfully.");
+      setDeletingTx(null);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Failed to delete transaction.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const deleteItemName = deletingTx
+    ? `${deletingTx.type === "income" ? "+" : "−"}${fmt(deletingTx.amount)} · ${
+        getCat(deletingTx.category_id)?.name ?? "Uncategorized"
+      }`
+    : undefined;
 
   if (loading) return <LoadingScreen />;
   if (error) return <p className="p-5 text-rose-400">{error}</p>;
 
   return (
-    <div className="p-3 sm:p-5 space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-5">
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 sm:p-4">
+    <div className="safe-px space-y-4 p-3 sm:p-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <p className="text-xs text-slate-400">
+          Filter, edit, and export your ledger
+        </p>
+        <button
+          type="button"
+          onClick={exportCsv}
+          className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-[#161b22] px-3 text-xs font-medium text-slate-200 hover:bg-slate-800 sm:h-9 sm:w-auto"
+        >
+          <Download size={14} />
+          Export CSV
+        </button>
+      </div>
+
+      <div className="mb-5 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-4">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 sm:p-4">
           <p className="text-xs text-slate-400">Income</p>
-          <h2 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-emerald-400">
+          <h2 className="mt-1 truncate text-base font-bold text-emerald-400 sm:mt-2 sm:text-2xl">
             {fmt(totalIncome)}
           </h2>
         </div>
 
-        <div className="rounded-xl bg-rose-500/10 border border-rose-500/20 p-3 sm:p-4">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 sm:p-4">
           <p className="text-xs text-slate-400">Expense</p>
-          <h2 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-rose-400">
+          <h2 className="mt-1 truncate text-base font-bold text-rose-400 sm:mt-2 sm:text-2xl">
             {fmt(totalExpense)}
           </h2>
         </div>
 
-        <div className="rounded-xl bg-indigo-500/10 border border-indigo-500/20 p-3 sm:p-4">
+        <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 sm:p-4">
           <p className="text-xs text-slate-400">Balance</p>
-          <h2 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-indigo-400">
+          <h2 className="mt-1 truncate text-base font-bold text-indigo-400 sm:mt-2 sm:text-2xl">
             {fmt(balance)}
           </h2>
         </div>
 
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-3 sm:p-4">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 sm:p-4">
           <p className="text-xs text-slate-400">Transactions</p>
-          <h2 className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-white">
+          <h2 className="mt-1 text-base font-bold text-white sm:mt-2 sm:text-2xl">
             {filteredTransactions.length}
           </h2>
         </div>
       </div>
 
-      {/* Responsive Filter Control Bar */}
-      <div className="mb-5 grid grid-cols-2 md:flex flex-wrap gap-2 sm:gap-3">
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:gap-3 md:flex md:flex-wrap">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
-          className="col-span-2 md:flex-1 h-10 rounded-sm border border-slate-700 bg-[#161b22] px-3 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-slate-500"
+          className="col-span-2 h-11 rounded-lg border border-slate-700 bg-[#161b22] px-3 text-sm text-white focus:border-slate-500 focus:outline-none md:h-10 md:flex-1 sm:px-4"
+        />
+
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          className="h-11 rounded-lg border border-slate-700 bg-[#161b22] px-2 text-sm text-white focus:border-slate-500 focus:outline-none md:h-10 sm:px-3"
+          title="From date"
+        />
+
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+          className="h-11 rounded-lg border border-slate-700 bg-[#161b22] px-2 text-sm text-white focus:border-slate-500 focus:outline-none md:h-10 sm:px-3"
+          title="To date"
         />
 
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="h-10 rounded-sm border border-slate-700 bg-[#161b22] px-2 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-slate-500"
+          className="h-11 rounded-lg border border-slate-700 bg-[#161b22] px-2 text-sm text-white focus:border-slate-500 focus:outline-none md:h-10 sm:px-4"
         >
           <option value="all">All Types</option>
           <option value="income">Income</option>
@@ -133,7 +254,7 @@ export default function Transactions() {
         <select
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value)}
-          className="h-10 rounded-sm border border-slate-700 bg-[#161b22] px-2 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-slate-500"
+          className="h-11 rounded-lg border border-slate-700 bg-[#161b22] px-2 text-sm text-white focus:border-slate-500 focus:outline-none md:h-10 sm:px-4"
         >
           <option value="all">All Methods</option>
           {[...new Set(transactions.map((t) => t.payment_method))]
@@ -148,7 +269,7 @@ export default function Transactions() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="col-span-2 md:col-span-1 h-10 rounded-sm border border-slate-700 bg-[#161b22] px-2 sm:px-4 text-xs sm:text-sm text-white focus:outline-none focus:border-slate-500"
+          className="col-span-2 h-11 rounded-lg border border-slate-700 bg-[#161b22] px-2 text-sm text-white focus:border-slate-500 focus:outline-none md:col-span-1 md:h-10 sm:px-4"
         >
           <option value="all">All Categories</option>
           {categories.map((cat) => (
@@ -161,13 +282,12 @@ export default function Transactions() {
         <button
           type="button"
           onClick={clearFilters}
-          className="col-span-2 md:col-span-1 h-10 rounded-sm border border-slate-700 bg-[#161b22] px-4 text-xs sm:text-sm font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white"
+          className="col-span-2 h-11 rounded-lg border border-slate-700 bg-[#161b22] px-4 text-sm font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white md:col-span-1 md:h-10"
         >
           Clear Filters
         </button>
       </div>
 
-      {/* Transactions Container */}
       <div className="bg-[#161b22] border border-white/[0.07] rounded-sm overflow-hidden">
         {filteredTransactions.length === 0 ? (
           <div className="py-12 text-center text-white text-xs">
@@ -175,7 +295,6 @@ export default function Transactions() {
           </div>
         ) : (
           <>
-            {/* Mobile Card View (Visible on small screens) */}
             <div className="block md:hidden divide-y divide-white/[0.07]">
               {filteredTransactions.map((tx) => {
                 const cat = getCat(tx.category_id);
@@ -203,10 +322,20 @@ export default function Transactions() {
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <button className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => setEditingTx(tx)}
+                          className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-slate-200"
+                          title="Edit"
+                        >
                           <Pencil size={12} />
                         </button>
-                        <button className="p-1 rounded hover:bg-rose-500/15 text-slate-400 hover:text-rose-400">
+                        <button
+                          type="button"
+                          onClick={() => setDeletingTx(tx)}
+                          className="p-1 rounded hover:bg-rose-500/15 text-slate-400 hover:text-rose-400"
+                          title="Delete"
+                        >
                           <Trash2 size={12} />
                         </button>
                       </div>
@@ -244,7 +373,6 @@ export default function Transactions() {
               })}
             </div>
 
-            {/* Desktop Table View (Visible on desktop screens) */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -325,10 +453,20 @@ export default function Transactions() {
                         </td>
                         <td className="px-4 py-2.5">
                           <div className="flex items-center justify-end gap-0.5">
-                            <button className="p-1.5 rounded hover:bg-white/8 text-slate-400 hover:text-slate-300 transition-colors">
+                            <button
+                              type="button"
+                              onClick={() => setEditingTx(tx)}
+                              className="p-1.5 rounded hover:bg-white/8 text-slate-400 hover:text-slate-300 transition-colors"
+                              title="Edit"
+                            >
                               <Pencil size={12} />
                             </button>
-                            <button className="p-1.5 rounded hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors">
+                            <button
+                              type="button"
+                              onClick={() => setDeletingTx(tx)}
+                              className="p-1.5 rounded hover:bg-rose-500/15 text-slate-400 hover:text-rose-400 transition-colors"
+                              title="Delete"
+                            >
                               <Trash2 size={12} />
                             </button>
                           </div>
@@ -342,6 +480,26 @@ export default function Transactions() {
           </>
         )}
       </div>
+
+      <TransactionModal
+        open={Boolean(editingTx)}
+        type={editingTx?.type ?? "expense"}
+        transaction={editingTx}
+        updateTransaction={updateTransaction}
+        onClose={() => setEditingTx(null)}
+      />
+
+      <DeleteConfirmModal
+        open={Boolean(deletingTx)}
+        title="Delete Transaction"
+        message="This transaction will be permanently removed. This action cannot be undone."
+        itemName={deleteItemName}
+        loading={deleting}
+        onClose={() => {
+          if (!deleting) setDeletingTx(null);
+        }}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

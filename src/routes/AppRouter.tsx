@@ -9,11 +9,9 @@ import AppLayout from "../layouts/AppLayout";
 import Transactions from "../pages/Transactions";
 import Settings from "../pages/Settings";
 import MonthlyProfit from "../pages/MonthlyProfit";
-
+import LeakReport from "../pages/LeakReport";
 
 export default function AppRouter() {
-
- 
   return (
     <BrowserRouter>
       <Routes>
@@ -27,6 +25,7 @@ export default function AppRouter() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="settings" element={<Settings />} />
             <Route path="profit" element={<MonthlyProfit />} />
+            <Route path="leaks" element={<LeakReport />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

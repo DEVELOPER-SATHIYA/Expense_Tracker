@@ -47,10 +47,9 @@ export default function MonthlyProfit() {
   if (error) return <p className="p-5 text-rose-400">{error}</p>;
 
   return (
-    <div className="p-3 sm:p-5 space-y-4 sm:space-y-5 max-w-7xl mx-auto">
-      {/* Month Selector Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">
+    <div className="safe-px mx-auto max-w-7xl space-y-4 p-3 sm:space-y-5 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-lg font-bold text-white sm:text-2xl">
           Monthly Profit
         </h1>
 
@@ -58,30 +57,27 @@ export default function MonthlyProfit() {
           type="month"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          className="w-full sm:w-auto rounded-lg border border-slate-700 bg-[#161b22] px-3 sm:px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-slate-700 bg-[#161b22] px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:w-auto sm:px-4 sm:py-2"
         />
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-        {/* Income Card */}
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 sm:p-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 sm:gap-4">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 sm:p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs sm:text-sm text-slate-400">Income</p>
-            <TrendingUp className="w-5 h-5 text-emerald-400" />
+            <p className="text-xs text-slate-400 sm:text-sm">Income</p>
+            <TrendingUp className="h-5 w-5 text-emerald-400" />
           </div>
-          <h2 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-bold text-emerald-400">
+          <h2 className="mt-2 truncate text-2xl font-bold text-emerald-400 sm:mt-3 sm:text-3xl">
             {fmt(totalIncome)}
           </h2>
         </div>
 
-        {/* Expense Card */}
-        <div className="rounded-xl bg-rose-500/10 border border-rose-500/20 p-4 sm:p-5">
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 sm:p-5">
           <div className="flex items-center justify-between">
-            <p className="text-xs sm:text-sm text-slate-400">Expense</p>
-            <TrendingDown className="w-5 h-5 text-rose-400" />
+            <p className="text-xs text-slate-400 sm:text-sm">Expense</p>
+            <TrendingDown className="h-5 w-5 text-rose-400" />
           </div>
-          <h2 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-bold text-rose-400">
+          <h2 className="mt-2 truncate text-2xl font-bold text-rose-400 sm:mt-3 sm:text-3xl">
             {fmt(totalExpense)}
           </h2>
         </div>

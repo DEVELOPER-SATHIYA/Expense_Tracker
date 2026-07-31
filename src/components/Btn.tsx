@@ -7,7 +7,7 @@ export default function Btn({
   variant?: "primary" | "ghost" | "danger";
 }) {
   const v = {
-    primary: "bg-[#161b22] hover:bg-[#161b22]/90 text-white",
+    primary: "bg-amber-500 hover:bg-amber-400 text-[#0d1117]",
     ghost:
       "bg-white/6 hover:bg-white/10 text-slate-300 hover:text-white border border-white/8",
     danger:
@@ -16,7 +16,7 @@ export default function Btn({
   return (
     <button
       {...props}
-      className={`px-3 py-1.5 rounded-sm text-sm font-medium transition-colors flex items-center gap-1.5 ${v} ${className ?? ""}`}
+      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${v} ${className ?? ""}`}
     >
       {children}
     </button>

@@ -1,22 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoadingScreen from "../pages/LoadingScreen";
 
 export default function PublicRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontSize: "18px",
-          fontWeight: 500,
-        }}
-      >
-        Loading...
+      <div className="h-screen bg-[#0d1117]">
+        <LoadingScreen />
       </div>
     );
   }
