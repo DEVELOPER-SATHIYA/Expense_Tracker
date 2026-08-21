@@ -21,9 +21,12 @@ import MS from "../constants/MS";
 import { ChevronRight, TrendingDown, TrendingUp } from "lucide-react";
 import Btn from "../components/Btn";
 import LoadingScreen from "./LoadingScreen";
+import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [incomeOpen, setIncomeOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [bulkIncomeOpen, setBulkIncomeOpen] = useState(false);
@@ -131,11 +134,12 @@ export default function Dashboard() {
   if (loading) return <LoadingScreen />;
 
   if (error) return <p>{error}</p>;
+  const username = user?.email.split("@")[0] || 'User';
 
   return (
     <div className="safe-px space-y-4 p-3 sm:space-y-5 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-base font-bold sm:text-lg">Dashboard</h1>
+        <h1 className="text-base font-bold sm:text-lg">Welcome Back , {username} !</h1>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
           <Btn
             onClick={() => setIncomeOpen(true)}
@@ -205,9 +209,8 @@ export default function Dashboard() {
                     {item.method}
                   </span>
                   <span
-                    className={`flex-shrink-0 font-mono text-[11px] font-medium ${
-                      item.balance >= 0 ? "text-indigo-400" : "text-rose-400"
-                    }`}
+                    className={`flex-shrink-0 font-mono text-[11px] font-medium ${item.balance >= 0 ? "text-indigo-400" : "text-rose-400"
+                      }`}
                   >
                     {fmt(item.balance)}
                   </span>
