@@ -10,6 +10,7 @@ import Transactions from "../pages/Transactions";
 import Settings from "../pages/Settings";
 import MonthlyProfit from "../pages/MonthlyProfit";
 import LeakReport from "../pages/LeakReport";
+import Dockets from "../pages/Dockets";
 import Onboarding from "../pages/Onboarding";
 
 export default function AppRouter() {
@@ -28,6 +29,7 @@ export default function AppRouter() {
             <Route path="settings" element={<Settings />} />
             <Route path="profit" element={<MonthlyProfit />} />
             <Route path="leaks" element={<LeakReport />} />
+            <Route path="dockets" element={<Dockets />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

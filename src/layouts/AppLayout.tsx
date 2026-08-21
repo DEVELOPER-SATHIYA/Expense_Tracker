@@ -13,6 +13,7 @@ export default function AppLayout() {
     "/transactions": "Transactions",
     "/profit": "Monthly Profit",
     "/leaks": "Leak Report",
+    "/dockets": "Dockets",
     "/settings": "Settings",
   };
 

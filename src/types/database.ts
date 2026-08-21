@@ -124,6 +124,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      },
+      dockets: {
+        Row: {
+          account_id: string
+          amount: number | null
+          chargeable_weight: number | null
+          created_at: string
+          delivery_status: string | null
+          docket_number: string
+          id: string
+          status: string
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount?: number | null
+          chargeable_weight?: number | null
+          created_at?: string
+          delivery_status?: string | null
+          docket_number: string
+          id?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number | null
+          chargeable_weight?: number | null
+          created_at?: string
+          delivery_status?: string | null
+          docket_number?: string
+          id?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dockets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dockets_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

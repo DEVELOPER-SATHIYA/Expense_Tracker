@@ -34,36 +34,49 @@ export default function Transactions() {
   const getCat = (id: string) => categories.find((c) => c.id === id);
   const getAcc = (id: string) => accounts.find((a) => a.id === id);
 
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((tx) => {
-      const cat = getCat(tx.category_id);
-
-      const matchesSearch =
-        search === "" ||
-        cat?.name.toLowerCase().includes(search.toLowerCase()) ||
-        tx.notes?.toLowerCase().includes(search.toLowerCase()) ||
-        tx.payment_method?.toLowerCase().includes(search.toLowerCase());
-
-      const matchesType = typeFilter === "all" || tx.type === typeFilter;
-
-      const matchesPayment =
-        paymentFilter === "all" || tx.payment_method === paymentFilter;
-
-      const matchesCategory =
-        categoryFilter === "all" || tx.category_id === categoryFilter;
-
-      const matchesFrom = !fromDate || tx.transaction_date >= fromDate;
-      const matchesTo = !toDate || tx.transaction_date <= toDate;
-
-      return (
-        matchesSearch &&
-        matchesType &&
-        matchesPayment &&
-        matchesCategory &&
-        matchesFrom &&
-        matchesTo
-      );
+  const formatTxTime = (createdAt: string) =>
+    new Date(createdAt).toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     });
+
+  const filteredTransactions = useMemo(() => {
+    return transactions
+      .filter((tx) => {
+        const cat = getCat(tx.category_id);
+
+        const matchesSearch =
+          search === "" ||
+          cat?.name.toLowerCase().includes(search.toLowerCase()) ||
+          tx.notes?.toLowerCase().includes(search.toLowerCase()) ||
+          tx.payment_method?.toLowerCase().includes(search.toLowerCase());
+
+        const matchesType = typeFilter === "all" || tx.type === typeFilter;
+
+        const matchesPayment =
+          paymentFilter === "all" || tx.payment_method === paymentFilter;
+
+        const matchesCategory =
+          categoryFilter === "all" || tx.category_id === categoryFilter;
+
+        const matchesFrom = !fromDate || tx.transaction_date >= fromDate;
+        const matchesTo = !toDate || tx.transaction_date <= toDate;
+
+        return (
+          matchesSearch &&
+          matchesType &&
+          matchesPayment &&
+          matchesCategory &&
+          matchesFrom &&
+          matchesTo
+        );
+      })
+      .sort((a, b) => {
+        const byDate = b.transaction_date.localeCompare(a.transaction_date);
+        if (byDate !== 0) return byDate;
+        return (b.created_at || "").localeCompare(a.created_at || "");
+      });
   }, [
     transactions,
     search,
@@ -318,7 +331,7 @@ export default function Transactions() {
                           {tx.type}
                         </span>
                         <span className="text-slate-400 text-[11px] font-mono">
-                          {tx.transaction_date}
+                          {tx.transaction_date} {formatTxTime(tx.created_at)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -378,7 +391,7 @@ export default function Transactions() {
                 <thead>
                   <tr className="border-b border-white/[0.07]">
                     <th className="px-4 py-2.5 text-left text-[10px] text-slate-300 font-medium uppercase tracking-wide">
-                      Date
+                      Date & Time
                     </th>
                     <th className="px-4 py-2.5 text-left text-[10px] text-slate-300 font-medium uppercase tracking-wide">
                       Type
@@ -411,7 +424,7 @@ export default function Transactions() {
                         className="hover:bg-white/[0.02] transition-colors"
                       >
                         <td className="px-4 py-2.5 text-slate-500 font-mono whitespace-nowrap">
-                          {tx.transaction_date}
+                          {tx.transaction_date} {formatTxTime(tx.created_at)}
                         </td>
                         <td className="px-4 py-2.5">
                           <span

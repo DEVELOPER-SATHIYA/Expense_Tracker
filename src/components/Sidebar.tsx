@@ -8,6 +8,7 @@ import {
   LogOut,
   IndianRupee,
   Droplets,
+  Package,
   X,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -19,6 +20,7 @@ const menus = [
   { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
   { name: "Monthly Profit", path: "/profit", icon: IndianRupee },
   { name: "Leak Report", path: "/leaks", icon: Droplets },
+  { name: "Dockets", path: "/dockets", icon: Package },
   { name: "Settings", path: "/settings", icon: Settings },
 ];
 

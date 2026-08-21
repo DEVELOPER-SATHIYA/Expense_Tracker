@@ -48,6 +48,9 @@ class TransactionService {
       .eq("account_id", accountId)
       .order("transaction_date", {
         ascending: false,
+      })
+      .order("created_at", {
+        ascending: false,
       });
 
     if (error) throw error;
@@ -158,6 +161,9 @@ class TransactionService {
       .eq("account_id", accountId)
       .order("transaction_date", {
         ascending: false,
+      })
+      .order("created_at", {
+        ascending: false,
       });
 
     if (error) throw error;
@@ -208,6 +214,9 @@ class TransactionService {
       .lte("transaction_date", end)
       .eq("account_id", accountId)
       .order("transaction_date", {
+        ascending: false,
+      })
+      .order("created_at", {
         ascending: false,
       });
 
